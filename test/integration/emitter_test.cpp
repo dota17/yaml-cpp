@@ -861,19 +861,19 @@ TEST_F(EmitterTest, BoolFormatting) {
 }
 
 // TODO: Fix this test.
-// TEST_F(EmitterTest, DocStartAndEnd) {
-//  out << BeginDoc;
-//  out << BeginSeq << 1 << 2 << 3 << EndSeq;
-//  out << BeginDoc;
-//  out << "Hi there!";
-//  out << EndDoc;
-//  out << EndDoc;
-//  out << EndDoc;
-//  out << BeginDoc;
-//  out << VerbatimTag("foo") << "bar";
-//  ExpectEmit(
-//      "---\n- 1\n- 2\n- 3\n---\nHi there!\n...\n...\n...\n---\n!<foo> bar");
-//}
+ TEST_F(EmitterTest, DocStartAndEnd) {
+  out << BeginDoc;
+  out << BeginSeq << 1 << 2 << 3 << EndSeq;
+  out << BeginDoc;
+  out << "Hi there!";
+  out << EndDoc;
+  out << EndDoc;
+  out << EndDoc;
+  out << BeginDoc;
+  out << BeginSeq << VerbatimTag("foo") << "bar" << EndSeq;
+  ExpectEmit(
+      "---\n- 1\n- 2\n- 3\n---\nHi there!\n...\n...\n...\n---\n- !<foo> bar");
+}
 
 TEST_F(EmitterTest, ImplicitDocStart) {
   out << "Hi";
