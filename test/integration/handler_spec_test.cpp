@@ -652,8 +652,17 @@ TEST_F(HandlerSpecTest, Ex5_8_QuotedScalarIndicators) {
   Parse(ex5_8);
 }
 
-// TODO: 5.9 directive
-// TODO: 5.10 reserved indicator
+TEST_F(HandlerSpecTest, Ex5_9_DirectiveIndicator) {
+  EXPECT_CALL(handler, OnDocumentStart(_));
+  EXPECT_CALL(handler, OnScalar(_, "?", 0, "text"));
+  EXPECT_CALL(handler, OnDocumentEnd());
+  Parse(ex5_9);
+}
+
+TEST_F(HandlerSpecTest, Ex5_10_InvalidUseOfReservedIndicators) {
+  EXPECT_THROW_PARSER_EXCEPTION(IgnoreParse(ex5_10),
+                                ErrorMsg::UNKNOWN_TOKEN);
+}
 
 TEST_F(HandlerSpecTest, Ex5_11_LineBreakCharacters) {
   EXPECT_CALL(handler, OnDocumentStart(_));

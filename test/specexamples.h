@@ -264,7 +264,12 @@ const char *ex2_28 =
     "    code: |-\n"
     "      foo = bar";
 
-// TODO: 5.1 - 5.2 BOM
+const char *ex5_1 = "\xFE\xFF# Comment only.";
+
+const char *ex5_2 =
+    "- Invalid use of BOM\n"
+    "\xFE\xFF"
+    "- Inside a document";
 
 const char *ex5_3 =
     "sequence:\n"
@@ -297,8 +302,13 @@ const char *ex5_8 =
     "single: 'text'\n"
     "double: \"text\"";
 
-// TODO: 5.9 directive
-// TODO: 5.10 reserved indicator
+const char *ex5_9 =
+    "%YAML 1.2\n"
+    "--- text";
+
+const char *ex5_10 =
+    "commercial-at: @text\n"
+    "grave-accent: `text";
 
 const char *ex5_11 =
     "|\n"

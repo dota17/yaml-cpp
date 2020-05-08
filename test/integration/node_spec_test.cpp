@@ -444,7 +444,11 @@ TEST(NodeSpecTest, Ex5_8_QuotedScalarIndicators) {
 }
 
 // TODO: 5.9 directive
-// TODO: 5.10 reserved indicator
+
+TEST(NodeSpecTest, Ex5_10_InvalidUseOfReservedIndicators) {
+  EXPECT_THROW_PARSER_EXCEPTION(Load(ex5_10),
+                                std::string(ErrorMsg::UNKNOWN_TOKEN));
+}
 
 TEST(NodeSpecTest, Ex5_11_LineBreakCharacters) {
   Node doc = Load(ex5_11);
