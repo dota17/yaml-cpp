@@ -155,28 +155,28 @@ const char *ex2_18 =
     "  quoted scalar.\\n\"";
 
 const char *ex2_19 =
-    "canonical: 12345\n"
-    "decimal: +12345\n"
-    "octal: 0o14\n"
-    "hexadecimal: 0xC\n";
+    "canonical: !!int 12345\n"
+    "decimal: !!int +12345\n"
+    "octal: !!int 0o14\n"
+    "hexadecimal: !!int 0xC\n";
 
 const char *ex2_20 =
-    "canonical: 1.23015e+3\n"
-    "exponential: 12.3015e+02\n"
-    "fixed: 1230.15\n"
-    "negative infinity: -.inf\n"
-    "not a number: .NaN\n";
+    "canonical: !!float 1.23015e+3\n"
+    "exponential: !!float 12.3015e+02\n"
+    "fixed: !!float 1230.15\n"
+    "negative infinity: !!float -.inf\n"
+    "not a number: !!float .NaN\n";
 
 const char *ex2_21 =
     "null:\n"
-    "booleans: [ true, false ]\n"
-    "string: '012345'\n";
+    "booleans: [!!bool true, !!bool false ]\n"
+    "string: !!str '012345'\n";
 
 const char *ex2_22 =
-    "canonical: 2001-12-15T02:59:43.1Z\n"
-    "iso8601: 2001-12-14t21:59:43.10-05:00\n"
-    "spaced: 2001-12-14 21:59:43.10 -5\n"
-    "date: 2002-12-14\n";
+    "canonical: !!timestamp 2001-12-15T02:59:43.1Z\n"
+    "iso8601: !!timestamp 2001-12-14t21:59:43.10-05:00\n"
+    "spaced: !!timestamp 2001-12-14 21:59:43.10 -5\n"
+    "date: !!timestamp 2002-12-14\n";
 
 const char *ex2_23 =
     "---\n"
