@@ -163,6 +163,15 @@ inner_encode(const T& rhs, std::stringstream& stream){
       const std::string& input = node.Scalar();                            \
       std::stringstream stream(input);                                     \
       stream.unsetf(std::ios::dec);                                        \
+      if ((stream.peek() == '-')                              \
+        && (typeid(rhs) == typeid(unsigned)                                \
+        || typeid(rhs) == typeid(unsigned short)                           \
+        || typeid(rhs) == typeid(unsigned long)                            \
+        || typeid(rhs) == typeid(unsigned long long)                       \
+        || typeid(rhs) == typeid(unsigned long long)                       \
+        || typeid(rhs) == typeid(unsigned char))) {                        \
+        return false;                                                      \
+      }                                                                    \
       if (typeid(rhs) == typeid(signed char)) {                            \
         signed char * a = (signed char *) &rhs;                            \
         return conversion::int16ToInt8(stream, a);                         \
