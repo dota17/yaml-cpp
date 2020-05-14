@@ -21,7 +21,7 @@ TEST(LoadNodeTest, FallbackValues) {
 }
 
 TEST(LoadNodeTest, NumericConversion) {
-  Node node = Load("[1.5, 1, .nan, .inf, -.inf, 0x15, 015]");
+  Node node = Load("[1.5, 1, .nan, .inf, -.inf, 0x15, 015, -21, 127, 128, 255, 266]");
   EXPECT_EQ(1.5f, node[0].as<float>());
   EXPECT_EQ(1.5, node[0].as<double>());
   EXPECT_THROW(node[0].as<int>(), TypedBadConversion<int>);
@@ -32,6 +32,15 @@ TEST(LoadNodeTest, NumericConversion) {
   EXPECT_EQ(-std::numeric_limits<float>::infinity(), node[4].as<float>());
   EXPECT_EQ(21, node[5].as<int>());
   EXPECT_EQ(13, node[6].as<int>());
+  EXPECT_EQ(-21, +node[7].as<int8_t>());
+  EXPECT_EQ(127, +node[8].as<int8_t>());
+  EXPECT_EQ(127, +node[8].as<uint8_t>());
+  EXPECT_EQ(127, +node[9].as<int8_t>());
+  EXPECT_EQ(128, +node[9].as<uint8_t>());
+  EXPECT_EQ(127, +node[10].as<int8_t>());
+  EXPECT_EQ(255, +node[10].as<uint8_t>());
+  EXPECT_EQ(127, +node[11].as<int8_t>());
+  EXPECT_EQ(255, +node[11].as<uint8_t>());
 }
 
 TEST(LoadNodeTest, Binary) {

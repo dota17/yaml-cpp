@@ -15,6 +15,10 @@
 #include <sstream>
 #include <type_traits>
 #include <vector>
+#include <limits>
+#include <cstdint>
+#include <algorithm>
+#include <typeinfo>
 
 #include "yaml-cpp/binary.h"
 #include "yaml-cpp/node/impl.h"
@@ -44,6 +48,32 @@ inline bool IsNegativeInfinity(const std::string& input) {
 
 inline bool IsNaN(const std::string& input) {
   return input == ".nan" || input == ".NaN" || input == ".NAN";
+}
+
+inline bool int16ToInt8(std::stringstream& stream, signed char* rhs) {
+  int16_t num;
+  if ((stream >> std::noskipws >> num) && (stream >> std::ws).eof()) {
+    if (num > INT8_MAX) {
+      *rhs = INT8_MAX;
+    } else if (num < INT8_MIN) {
+      *rhs = INT8_MIN;
+    } else {
+      *rhs = num;
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+inline bool uint16ToUint8(std::stringstream& stream, unsigned char* rhs) {
+  uint16_t num;
+  if ((stream >> std::noskipws >> num) && (stream >> std::ws).eof()) {
+    *rhs = std::min(num,(uint16_t)UINT8_MAX);
+    return true;
+  } else {
+    return false;
+  }
 }
 }
 
@@ -133,8 +163,16 @@ inner_encode(const T& rhs, std::stringstream& stream){
       const std::string& input = node.Scalar();                            \
       std::stringstream stream(input);                                     \
       stream.unsetf(std::ios::dec);                                        \
-      if ((stream >> std::noskipws >> rhs) && (stream >> std::ws).eof()) { \
-        return true;                                                       \
+      if (typeid(rhs) == typeid(signed char)) {                            \
+        signed char * a = (signed char *) &rhs;                            \
+        return conversion::int16ToInt8(stream, a);                         \
+      } else if (typeid(rhs) == typeid(unsigned char)) {                   \
+        unsigned char * a = (unsigned char *) &rhs;                        \
+        return conversion::uint16ToUint8(stream, a);                       \
+      } else {                                                             \
+        if ((stream >> std::noskipws >> rhs) && (stream >> std::ws).eof()) { \
+          return true;                                                     \
+        }                                                                  \
       }                                                                    \
       if (std::numeric_limits<type>::has_infinity) {                       \
         if (conversion::IsInfinity(input)) {                               \
