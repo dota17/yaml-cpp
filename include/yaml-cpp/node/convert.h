@@ -15,7 +15,6 @@
 #include <sstream>
 #include <type_traits>
 #include <vector>
-#include <limits>
 #include <cstdint>
 #include <algorithm>
 #include <typeinfo>
@@ -50,7 +49,7 @@ inline bool IsNaN(const std::string& input) {
   return input == ".nan" || input == ".NaN" || input == ".NAN";
 }
 
-inline bool int16ToInt8(std::stringstream& stream, signed char* rhs) {
+inline bool ConvertStreamToInt8(std::stringstream& stream, signed char* rhs) {
   int16_t num;
   if ((stream >> std::noskipws >> num) && (stream >> std::ws).eof()) {
     if (num > INT8_MAX) {
@@ -61,19 +60,17 @@ inline bool int16ToInt8(std::stringstream& stream, signed char* rhs) {
       *rhs = num;
     }
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
-inline bool uint16ToUint8(std::stringstream& stream, unsigned char* rhs) {
+inline bool ConvertStreamToUint8(std::stringstream& stream, unsigned char* rhs) {
   uint16_t num;
   if ((stream >> std::noskipws >> num) && (stream >> std::ws).eof()) {
-    *rhs = std::min(num,(uint16_t)UINT8_MAX);
+    *rhs = std::min(num, (uint16_t)UINT8_MAX);
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 }
 
@@ -163,21 +160,21 @@ inner_encode(const T& rhs, std::stringstream& stream){
       const std::string& input = node.Scalar();                            \
       std::stringstream stream(input);                                     \
       stream.unsetf(std::ios::dec);                                        \
-      if ((stream.peek() == '-')                              \
-        && (typeid(rhs) == typeid(unsigned)                                \
-        || typeid(rhs) == typeid(unsigned short)                           \
-        || typeid(rhs) == typeid(unsigned long)                            \
-        || typeid(rhs) == typeid(unsigned long long)                       \
-        || typeid(rhs) == typeid(unsigned long long)                       \
-        || typeid(rhs) == typeid(unsigned char))) {                        \
+      if ((stream.peek() == '-') &&                                        \
+        (typeid(rhs) == typeid(unsigned) ||                                \
+        typeid(rhs) == typeid(unsigned short) ||                           \
+        typeid(rhs) == typeid(unsigned long) ||                            \
+        typeid(rhs) == typeid(unsigned long long) ||                       \
+        typeid(rhs) == typeid(unsigned long long) ||                       \
+        typeid(rhs) == typeid(unsigned char))) {                           \
         return false;                                                      \
       }                                                                    \
       if (typeid(rhs) == typeid(signed char)) {                            \
-        signed char * a = (signed char *) &rhs;                            \
-        return conversion::int16ToInt8(stream, a);                         \
+        signed char* int8 = (signed char*) &rhs;                           \
+        return conversion::ConvertStreamToInt8(stream, int8);              \
       } else if (typeid(rhs) == typeid(unsigned char)) {                   \
-        unsigned char * a = (unsigned char *) &rhs;                        \
-        return conversion::uint16ToUint8(stream, a);                       \
+        unsigned char* uint8 = (unsigned char*) &rhs;                      \
+        return conversion::ConvertStreamToUint8(stream, uint8);            \
       } else {                                                             \
         if ((stream >> std::noskipws >> rhs) && (stream >> std::ws).eof()) { \
           return true;                                                     \

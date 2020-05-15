@@ -34,19 +34,15 @@ TEST(LoadNodeTest, NumericConversion) {
   EXPECT_EQ(13, node[6].as<int>());
   EXPECT_EQ(-128, +node[7].as<int8_t>());
   EXPECT_EQ(127, +node[8].as<int8_t>());
-  EXPECT_EQ(127, +node[8].as<uint8_t>());
   EXPECT_EQ(127, +node[9].as<int8_t>());
-  EXPECT_EQ(128, +node[9].as<uint8_t>());
-  EXPECT_EQ(127, +node[10].as<int8_t>());
   EXPECT_EQ(255, +node[10].as<uint8_t>());
-  EXPECT_EQ(127, +node[11].as<int8_t>());
   EXPECT_EQ(255, +node[11].as<uint8_t>());
-  //issue 859
+  // Throw error: convert signed number to unsigned number.
+  EXPECT_THROW(node[7].as<unsigned char>(), TypedBadConversion<unsigned char>);
   EXPECT_THROW(node[7].as<unsigned>(), TypedBadConversion<unsigned int>);
   EXPECT_THROW(node[7].as<unsigned short>(), TypedBadConversion<unsigned short>);
   EXPECT_THROW(node[7].as<unsigned long>(), TypedBadConversion<unsigned long>);
   EXPECT_THROW(node[7].as<unsigned long long>(), TypedBadConversion<unsigned long long>);
-  EXPECT_THROW(node[7].as<unsigned char>(), TypedBadConversion<unsigned char>);
 }
 
 TEST(LoadNodeTest, Binary) {

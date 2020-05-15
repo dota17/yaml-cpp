@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "yaml-cpp/node/convert.h"
 
 namespace {
