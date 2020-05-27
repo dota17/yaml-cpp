@@ -181,6 +181,8 @@ void Emitter::EmitEndDoc() {
   if (m_stream.col() > 0)
     m_stream << "\n";
   m_stream << "...\n";
+
+  m_pState->EndedDoc();
 }
 
 // EmitBeginSeq
