@@ -211,6 +211,39 @@ TEST(LoadNodeTest, DereferenceIteratorError) {
   EXPECT_THROW(node.begin()->begin()->Type(), InvalidNode);
 }
 
+TEST(LoadNodeTest, LoadAllFromString) {
+  std::string str = "a: A\n---\nb: B\n";
+  std::vector<Node> docs = LoadAll(str);
+  EXPECT_EQ(2, docs.size());
+
+  {
+    Node doc = docs[0];
+    EXPECT_EQ(1, doc.size());
+    EXPECT_EQ("A", doc["a"].as<std::string>());
+  }
+
+  {
+    Node doc = docs[1];
+    EXPECT_EQ(1, doc.size());
+    EXPECT_EQ("B", doc["b"].as<std::string>());
+  }
+}
+
+
+TEST(LoadNodeTest, PrintTokens) {
+  std::stringstream stream("a: A");
+  std::stringstream out;
+  YAML::Parser parse(stream);
+  parse.PrintTokens(out);
+  EXPECT_EQ("BLOCK_MAP_START: \n"
+            "KEY: \n"
+            "SCALAR: a\n"
+            "VALUE: \n"
+            "SCALAR: A\n"
+            "BLOCK_MAP_END: \n",
+            out.str());
+}
+
 TEST(NodeTest, EmitEmptyNode) {
   Node node;
   Emitter emitter;
