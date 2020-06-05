@@ -865,4 +865,103 @@ const char *ex8_22 =
     " - nested\n"
     "mapping: !!map\n"
     " foo: bar\n";
+
+const char *ex9_1 =
+    "⇔# Comment\n"
+    "# lines\n"
+    "Document";
+
+const char *ex9_2 =
+    "%YAML 1.2\n"
+    "---\n"
+    "Document\n"
+    "... # Suffix";
+
+const char *ex9_3 =
+    "Bare\n"
+    "document\n"
+    "...\n"
+    "# No document\n"
+    "...\n"
+    "|\n"
+    " %!PS-Adobe-2.0 # Not the first line";
+
+const char *ex9_5 =
+    "%YAML 1.2\n"
+    "--- |\n"
+    " %!PS-Adobe-2.0\n"
+    "   \n"
+    "%YAML1.2\n"
+    "---\n"
+    "# Empty\n"
+    "   ";
+
+const char *ex9_6 =
+    "Document\n"
+    "---\n"
+    "# Empty\n"
+    "...\n"
+    "%YAML 1.2\n"
+    "---\n"
+    "matches %: 20";
+
+const char *ex10_1 =
+    "Block style: !!map\n"
+    "  Clark : Evans\n"
+    "  Ingy  : döt Net\n"
+    "  Oren  : Ben-Kiki\n"
+    "\n"
+    "Flow style: !!map { Clark: Evans, Ingy: döt Net, Oren: Ben-Kiki }";
+    
+const char *ex10_2 =
+    "Block style: !!seq\n"
+    "- Clark Evans\n"
+    "- Ingy döt Net\n"
+    "- Oren Ben-Kiki\n"
+    "\n"
+    "Flow style: !!seq [ Clark Evans, Ingy döt Net, Oren Ben-Kiki ]";
+
+const char *ex10_3 =
+    "Block style: !!str |-\n"
+    "  String: just a theory.\n"
+    "\n"
+    "Flow style: !!str \"String: just a theory.\"";
+
+const char *ex10_4 =
+    "!!null null: value for null key\n"
+    "key with null value: !!null null";
+
+const char *ex10_5 =
+    "YAML is a superset of JSON: !!bool true\n"
+    "Pluto is a planet: !!bool false";
+
+const char *ex10_6 =
+    "negative: !!int -12\n"
+    "zero: !!int 0\n"
+    "positive: !!int 34";
+
+const char *ex10_7 =
+    "negative: !!float -1\n"
+    "zero: !!float 0\n"
+    "positive: !!float 2.3e4\n"
+    "infinity: !!float .inf\n"
+    "not a number: !!float .nan";
+
+const char *ex10_8 =
+    "A null: null\n"
+    "Booleans: [ true, false ]\n"
+    "Integers: [ 0, -0, 3, -19 ]\n"
+    "Floats: [ 0., -0.0, 12e03, -2E+05 ]\n"
+    "Invalid: [ True, Null, 0o7, 0x3A, +12.3 ]";
+
+const char *ex10_9 =
+    "A null: null\n"
+    "Also a null: # Empty\n"
+    "Not a null: \"\"\n"
+    "Booleans: [ true, True, false, FALSE ]\n"
+    "Integers: [ 0, 0o7, 0x3A, -19 ]\n"
+    "Floats: [ 0., -0.0, .5, +12e03, -2E+05 ]\n"
+    "Also floats: [ .inf, -.Inf, +.INF, .NAN ]";
 }
+
+

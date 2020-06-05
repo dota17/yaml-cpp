@@ -1132,5 +1132,203 @@ TEST(NodeSpecTest, FlowMapNotClosed) {
   EXPECT_THROW_PARSER_EXCEPTION(Load("{x:"), ErrorMsg::UNKNOWN_TOKEN);
 }
 
+TEST(NodeSpecTest, Ex9_1_DocumentPrefix) {
+  Node doc = Load(ex9_1);
+  EXPECT_EQ("\xE2\x87\x94# Comment", doc.as<std::string>());
+}
+
+TEST(NodeSpecTest, Ex9_2_DocumentMarkers) {
+  Node doc = Load(ex9_2);
+  EXPECT_TRUE(doc.as<std::string>() == "Document");
+}
+
+TEST(NodeSpecTest, Ex9_3_BareDocuments) {
+  std::vector<Node> docs = LoadAll(ex9_3);
+  EXPECT_EQ(2, docs.size());
+
+  {
+    Node doc = docs[0];
+    EXPECT_TRUE(doc.as<std::string>() == "Bare document");
+  }
+
+  {
+    Node doc = docs[1];
+    EXPECT_EQ("%!PS-Adobe-2.0 # Not the first line", doc.as<std::string>());
+  }
+}
+
+TEST(NodeSpecTest, Ex9_5_DirectivesDocuments) {
+  std::vector<Node> docs = LoadAll(ex9_5);
+  EXPECT_EQ(2, docs.size());
+
+  {
+    Node doc = docs[0];
+    EXPECT_EQ("%!PS-Adobe-2.0\n  \n", doc.as<std::string>());
+  }
+
+  {
+    Node doc = docs[1];
+    EXPECT_TRUE(doc.IsNull());
+  }
+}
+
+TEST(NodeSpecTest, Ex9_6_Stream) {
+  std::vector<Node> docs = LoadAll(ex9_6);
+  EXPECT_EQ(3, docs.size());
+
+  {
+    Node doc = docs[0];
+    EXPECT_EQ("Document", doc.as<std::string>());
+  }
+
+  {
+    Node doc = docs[1];
+    EXPECT_TRUE(doc.IsNull());
+  }
+
+  {
+    Node doc = docs[2];
+    EXPECT_EQ(20, doc["matches %"].as<int>());
+  }
+}
+
+TEST(NodeSpecTest, Ex10_1_MapExamples) {
+  Node doc = Load(ex10_1);
+  EXPECT_EQ(2, doc.size());
+  EXPECT_EQ("tag:yaml.org,2002:map", doc["Block style"].Tag());
+  EXPECT_EQ(3, doc["Block style"].size());
+  EXPECT_EQ("Evans", doc["Block style"]["Clark"].as<std::string>());
+  EXPECT_EQ("döt Net", doc["Block style"]["Ingy"].as<std::string>());
+  EXPECT_EQ("Ben-Kiki", doc["Block style"]["Oren"].as<std::string>());
+
+  EXPECT_EQ("tag:yaml.org,2002:map", doc["Flow style"].Tag());
+  EXPECT_EQ(3, doc["Flow style"].size());
+  EXPECT_EQ("Evans", doc["Flow style"]["Clark"].as<std::string>());
+  EXPECT_EQ("döt Net", doc["Flow style"]["Ingy"].as<std::string>());
+  EXPECT_EQ("Ben-Kiki", doc["Flow style"]["Oren"].as<std::string>());
+}
+
+TEST(NodeSpecTest, Ex10_2_SeqExamples) {
+  Node doc = Load(ex10_2);
+  EXPECT_EQ(2, doc.size());
+  EXPECT_EQ("tag:yaml.org,2002:seq", doc["Block style"].Tag());
+  EXPECT_EQ(3, doc["Block style"].size());
+  EXPECT_EQ("Clark Evans", doc["Block style"][0].as<std::string>());
+  EXPECT_EQ("Ingy döt Net", doc["Block style"][1].as<std::string>());
+  EXPECT_EQ("Oren Ben-Kiki", doc["Block style"][2].as<std::string>());
+    
+  EXPECT_EQ("tag:yaml.org,2002:seq", doc["Flow style"].Tag());
+  EXPECT_EQ(3, doc["Flow style"].size());
+  EXPECT_EQ("Clark Evans", doc["Flow style"][0].as<std::string>());
+  EXPECT_EQ("Ingy döt Net", doc["Flow style"][1].as<std::string>());
+  EXPECT_EQ("Oren Ben-Kiki", doc["Flow style"][2].as<std::string>());
+}
+
+TEST(NodeSpecTest, Ex10_3_StrExamples) {
+  Node doc = Load(ex10_3);
+  EXPECT_EQ(2, doc.size());
+  EXPECT_EQ("tag:yaml.org,2002:str", doc["Block style"].Tag());
+  EXPECT_EQ("String: just a theory.", doc["Block style"].as<std::string>());
+
+  EXPECT_EQ("tag:yaml.org,2002:str", doc["Flow style"].Tag());
+  EXPECT_EQ("String: just a theory.", doc["Flow style"].as<std::string>());
+}
+
+TEST(NodeSpecTest, Ex10_4_NullExamples) {
+  Node doc = Load(ex10_4);
+  EXPECT_EQ(2, doc.size());
+  EXPECT_EQ("value for null key", doc[Null].as<std::string>());
+  EXPECT_TRUE(doc["key with null value"].IsNull());
+}
+
+TEST(NodeSpecTest, Ex10_5_BoolExamples) {
+  Node doc = Load(ex10_5);
+  EXPECT_EQ(2, doc.size());
+  EXPECT_EQ("tag:yaml.org,2002:bool", doc["YAML is a superset of JSON"].Tag());
+  EXPECT_EQ(true, doc["YAML is a superset of JSON"].as<bool>());
+  EXPECT_EQ("tag:yaml.org,2002:bool", doc["Pluto is a planet"].Tag());
+  EXPECT_EQ(false, doc["Pluto is a planet"].as<bool>());
+}
+
+TEST(NodeSpecTest, Ex10_6_IntExamples) {
+  Node doc = Load(ex10_6);
+  EXPECT_EQ(3, doc.size());
+  EXPECT_EQ("tag:yaml.org,2002:int", doc["negative"].Tag());
+  EXPECT_EQ(-12, doc["negative"].as<int>());
+  EXPECT_EQ("tag:yaml.org,2002:int", doc["zero"].Tag());
+  EXPECT_EQ(0, doc["zero"].as<int>());
+  EXPECT_EQ("tag:yaml.org,2002:int", doc["positive"].Tag());
+  EXPECT_EQ(34, doc["positive"].as<int>());
+}
+
+TEST(NodeSpecTest, Ex10_7_FloatExamples) { 
+  Node doc = Load(ex10_7);
+  EXPECT_EQ(5, doc.size());
+  EXPECT_EQ("tag:yaml.org,2002:float", doc["negative"].Tag());
+  EXPECT_EQ(-1.0f, doc["negative"].as<float>());
+  EXPECT_EQ("tag:yaml.org,2002:float", doc["zero"].Tag());
+  EXPECT_EQ(0.0f, doc["zero"].as<float>());
+  EXPECT_EQ("tag:yaml.org,2002:float", doc["positive"].Tag());
+  EXPECT_EQ(2.3e4f, doc["positive"].as<float>());
+  EXPECT_EQ("tag:yaml.org,2002:float", doc["infinity"].Tag());
+  EXPECT_EQ(std::numeric_limits<float>::infinity(), doc["infinity"].as<float>());
+  EXPECT_EQ("tag:yaml.org,2002:float", doc["not a number"].Tag());
+  EXPECT_NE(doc["not a number"].as<float>(), doc["not a number"].as<float>());
+}
+
+TEST(NodeSpecTest, Ex10_8_JsonTagResolution) {
+  Node doc = Load(ex10_8);
+  EXPECT_EQ(5, doc.size());
+  EXPECT_TRUE(doc["A null"].IsNull());
+  EXPECT_EQ(2, doc["Booleans"].size());
+  EXPECT_EQ(true, doc["Booleans"][0].as<bool>());
+  EXPECT_EQ(false, doc["Booleans"][1].as<bool>());
+  EXPECT_EQ(4, doc["Integers"].size());
+  EXPECT_EQ(0, doc["Integers"][0].as<int>());
+  EXPECT_EQ(-0, doc["Integers"][1].as<int>());
+  EXPECT_EQ(3, doc["Integers"][2].as<int>());
+  EXPECT_EQ(-19, doc["Integers"][3].as<int>());
+  EXPECT_EQ(4, doc["Floats"].size());
+  EXPECT_EQ(0., doc["Floats"][0].as<float>());
+  EXPECT_EQ(-0.0, doc["Floats"][1].as<float>());
+  EXPECT_EQ(12e03, doc["Floats"][2].as<float>());
+  EXPECT_EQ(-2E+05, doc["Floats"][3].as<float>());
+  EXPECT_EQ(5, doc["Invalid"].size());
+  EXPECT_EQ("True", doc["Invalid"][0].as<std::string>());
+  EXPECT_TRUE(doc["Invalid"][1].IsNull());
+  EXPECT_EQ("0o7", doc["Invalid"][2].as<std::string>());
+  EXPECT_EQ("0x3A", doc["Invalid"][3].as<std::string>());
+  EXPECT_EQ("+12.3", doc["Invalid"][4].as<std::string>());
+}
+
+TEST(NodeSpecTest, Ex10_9_CoreTagResolution) {
+  Node doc = Load(ex10_9);
+  EXPECT_EQ(7, doc.size());
+  EXPECT_TRUE(doc["A null"].IsNull());
+  EXPECT_TRUE(doc["Also a null"].IsNull());
+  EXPECT_EQ("", doc["Not a null"].as<std::string>());
+  EXPECT_EQ(4, doc["Booleans"].size());
+  EXPECT_EQ(true, doc["Booleans"][0].as<bool>());
+  EXPECT_EQ("True", doc["Booleans"][1].as<std::string>());
+  EXPECT_EQ(false, doc["Booleans"][2].as<bool>());
+  EXPECT_EQ("FALSE", doc["Booleans"][3].as<std::string>());
+  EXPECT_EQ(4, doc["Integers"].size());
+  EXPECT_EQ(0, doc["Integers"][0].as<int>());
+  EXPECT_EQ("0o7", doc["Integers"][1].as<std::string>());
+  EXPECT_EQ(0x3A, doc["Integers"][2].as<int>());
+  EXPECT_EQ(-19, doc["Integers"][3].as<int>());
+  EXPECT_EQ(5, doc["Floats"].size());
+  EXPECT_EQ(0.f, doc["Floats"][0].as<float>());
+  EXPECT_EQ(-0.0f, doc["Floats"][1].as<float>());
+  EXPECT_EQ(.5f, doc["Floats"][2].as<float>());
+  EXPECT_EQ(+12e03f, doc["Floats"][3].as<float>());
+  EXPECT_EQ(-2E+05f, doc["Floats"][4].as<float>());
+  EXPECT_EQ(4, doc["Also floats"].size());
+  EXPECT_EQ(std::numeric_limits<float>::infinity(), doc["Also floats"][0].as<float>());
+  EXPECT_EQ(-std::numeric_limits<float>::infinity(), doc["Also floats"][1].as<float>());
+  EXPECT_EQ(+std::numeric_limits<float>::infinity(), doc["Also floats"][2].as<float>());
+  EXPECT_NE(doc["Also floats"][3].as<float>(), doc["Also floats"][3].as<float>());
+}
+
 }
 }
