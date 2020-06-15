@@ -258,9 +258,9 @@ TEST(NodeTest, LoadTildeAsNull) {
 }
     
 TEST(NodeTest, LoadTagWithParenthesis) {
-    Node node = Load("!Complex(Tag) foo");
-    EXPECT_EQ(node.Tag(), "!Complex(Tag)");
-    EXPECT_EQ(node.as<std::string>(), "foo");
+  Node node = Load("!Complex(Tag) foo");
+  EXPECT_EQ(node.Tag(), "!Complex(Tag)");
+  EXPECT_EQ(node.as<std::string>(), "foo");
 }
 
 TEST(NodeTest, LoadTagWithNullScalar) {
