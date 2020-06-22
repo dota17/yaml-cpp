@@ -292,5 +292,25 @@ TEST(NodeTest, LoadTagWithNullScalar) {
   EXPECT_TRUE(node.IsNull());
 }
 
+TEST(NodeTest, IncorrectPlainScalarInFlow) {
+  std::vector<ParserExceptionTestCase> tests = {
+      {"Plain scalar starting with \":\" and followed by an indicator",
+       "<< : [:]ore-max-padding, auto-init-128]", ErrorMsg::UNKNOWN_TOKEN},
+      {"Plain scalar starting with \":\" and followed by null",
+       "[:]", ErrorMsg::UNKNOWN_TOKEN},
+      {"Plain scalar starting with \":\" and followed by an indicator in a incorrect flow",
+       "{:]", ErrorMsg::UNKNOWN_TOKEN},
+  };
+  for (const ParserExceptionTestCase test : tests) {
+    try {
+      Load(test.input);
+      FAIL() << "Expected exception " << test.expected_exception << " for "
+             << test.name << ", input: " << test.input;
+    } catch (const ParserException& e) {
+      EXPECT_EQ(test.expected_exception, e.msg);
+    }
+  }
+}
+
 }  // namespace
 }  // namespace YAML

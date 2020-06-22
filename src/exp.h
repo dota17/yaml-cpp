@@ -155,7 +155,9 @@ inline const RegEx& PlainScalar() {
 inline const RegEx& PlainScalarInFlow() {
   static const RegEx e =
       !(BlankOrBreak() | RegEx("?,[]{}#&*!|>\'\"%@`", REGEX_OR) |
-        (RegEx("-:", REGEX_OR) + (Blank() | RegEx())));
+        (RegEx("-") + (Blank() | RegEx())) | 
+         (RegEx(":") + (RegEx(",[]{}", REGEX_OR) | BlankOrBreak() |
+		        NotPrintable() | Utf8_ByteOrderMark() | RegEx())));
   return e;
 }
 inline const RegEx& EndScalar() {
