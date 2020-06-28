@@ -238,6 +238,11 @@ TEST(NodeTest, ParseNodeStyle) {
   EXPECT_EQ(EmitterStyle::Block, Load("foo: bar").Style());
 }
 
+TEST(NodeTest, ParsePlainScalarEndingWithColon) {
+  Node node = Load("[aaa:,]");
+  EXPECT_EQ(1, node.size());
+  EXPECT_EQ("aaa:", node[0].Scalar());
+}
 struct ParserExceptionTestCase {
   std::string name;
   std::string input;
