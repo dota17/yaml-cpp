@@ -173,6 +173,45 @@ TEST(LoadNodeTest, CloneAlias) {
   EXPECT_EQ(clone[0], clone);
 }
 
+TEST(LoadNodeTest, CloneMark) {
+  Node node = Load(R"yaml({
+      "VALUE1": 1,
+      "VALUEA": "A",
+      "ARRAY1": [
+      { "A123": [ 1, 2, 3 ] },
+      { "A456": [ 4, 5, 6 ] },
+      { "A789": [ 7, 8, 9 ] } ],
+      "VALUEXYZ": {
+          "VALUEX": {
+              "X1": 1,
+              "X2": 2,
+              "X3": 3 },
+          "VALUEY": "Y" }
+      })yaml");
+  Node clone = Clone(node);
+  EXPECT_FALSE(clone == node);
+  std::string key;
+  Mark mark;
+  Mark newMark;
+  for (auto element : node) {
+    key = element.first.Scalar();
+    mark = node[key].Mark();
+    newMark = clone[key].Mark();
+    ASSERT_EQ(newMark.line, mark.line);
+  }
+
+  std::vector<std::string> keywords = {"VALUEXYZ", "VALUEX", "X1"};
+  Node originNode = node;
+  Node newNode = clone;
+  for (std::string keyword : keywords) {
+    originNode = originNode[keyword];
+    newNode = newNode[keyword];
+    mark = originNode.Mark();
+    newMark = newNode.Mark();
+    ASSERT_EQ(newMark.line, mark.line);
+  }
+}
+
 TEST(LoadNodeTest, ForceInsertIntoMap) {
   Node node;
   node["a"] = "b";
