@@ -53,6 +53,9 @@ Mark Scanner::mark() const { return INPUT.mark(); }
 void Scanner::EnsureTokensInQueue() {
   while (true) {
     if (!m_tokens.empty()) {
+      if (m_tokens.size() > 20000) {
+        throw ParserException(INPUT.mark(), ErrorMsg::BAD_INPUT);
+      }
       Token& token = m_tokens.front();
 
       // if this guy's valid, then we're done

@@ -215,6 +215,19 @@ TEST(LoadNodeTest, EmptyString) {
   EXPECT_TRUE(!node.IsNull());
 }
 
+TEST(LoadNodeTest, BadString) {
+  std::string inputString;
+  for (auto i = 0; i != 30000; ++i) {
+    inputString.push_back('{');
+  }
+  try {
+    Node node = Load(inputString);
+    FAIL() << "Expected exception: " << ErrorMsg::BAD_INPUT;
+  } catch (const ParserException& e) {
+    EXPECT_EQ(ErrorMsg::BAD_INPUT, e.msg);
+  }
+}
+
 TEST(LoadNodeTest, DereferenceIteratorError) {
   Node node = Load("[{a: b}, 1, 2]");
   EXPECT_THROW(node.begin()->first.as<int>(), InvalidNode);
