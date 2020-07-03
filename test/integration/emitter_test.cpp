@@ -46,6 +46,41 @@ TEST_F(EmitterTest, SimpleScalar) {
   ExpectEmit("Hello, World!");
 }
 
+TEST_F(EmitterTest, WriteQuotedScalar) {
+  Node n(Load(R"(- "false"
+- "False"
+- "01011001"
+- "07412"
+- "+125"
+- "-125"
+- "0xff125a"
+- "0."
+- "-0.0"
+- "+12e03"
+- "-2E+05"
+- ".inf"
+- "+.INF"
+- ".NAN")"));
+  out << n;
+  ExpectEmit(R"(- "false"
+- "False"
+- "01011001"
+- "07412"
+- "+125"
+- "-125"
+- "0xff125a"
+- "0."
+- "-0.0"
+- "+12e03"
+- "-2E+05"
+- ".inf"
+- "+.INF"
+- ".NAN")");
+}
+
+TEST_F(EmitterTest, NoQuotedScalar) {
+}
+
 TEST_F(EmitterTest, SimpleQuotedScalar) {
   Node n(Load("\"test\""));
   out << n;

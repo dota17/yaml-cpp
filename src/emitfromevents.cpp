@@ -5,6 +5,7 @@
 #include "yaml-cpp/emitter.h"
 #include "yaml-cpp/emittermanip.h"
 #include "yaml-cpp/null.h"
+#include "yaml-cpp/node/convert.h"
 
 namespace YAML {
 struct Mark;
@@ -15,6 +16,35 @@ std::string ToString(YAML::anchor_t anchor) {
   std::stringstream stream;
   stream << anchor;
   return stream.str();
+}
+
+template <typename T>
+bool IsNumber(const std::string& value) {
+  T rhs;
+  std::stringstream stream(value);
+  if (value.rfind("0x", 0) == 0 || value.rfind("0X", 0) == 0) {
+    stream >> std::hex;
+  } else if (value.rfind("0", 0) == 0) {
+    stream >> std::oct;
+  } else {
+    stream >> std::dec;
+  }
+  if ((stream >> std::noskipws >> rhs) && (stream >> std::ws).eof()) {
+    return true;
+  }
+  return false;
+}
+
+bool IsBool(const std::string& value) {
+  return value == "true" || value == "True" || value == "TRUE" ||
+      value == "false" || value == "False" || value == "FALSE";
+}
+
+bool IsWriteQuotation(const std::string& tag, const std::string& value) {
+  return (tag == "!") ? (IsNumber<int>(value) || IsNumber<double>(value) ||
+                         IsBool(value) || YAML::conversion::IsNaN(value) ||
+                         YAML::conversion::IsInfinity(value))
+                      : false;
 }
 }  // namespace
 
@@ -41,6 +71,9 @@ void EmitFromEvents::OnScalar(const Mark&, const std::string& tag,
                               anchor_t anchor, const std::string& value) {
   BeginNode();
   EmitProps(tag, anchor);
+  if (IsWriteQuotation(tag, value)) {
+    m_emitter << DoubleQuoted;
+  }
   m_emitter << value;
 }
 
