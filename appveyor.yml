@@ -25,4 +25,4 @@ build_script:
    - cmake --build build
 test_script:
    - cmd: cd build
-   - ctest --verbose
+   - ctest
