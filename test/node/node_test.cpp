@@ -534,6 +534,25 @@ TEST(NodeTest, Bool) {
   EXPECT_EQ(false, node[true].as<bool>());
 }
 
+TEST(NodeTest, AsBool) {
+  Node node;
+  node["key1"] = "False";
+  node["key2"] = "FALSE";
+  node["key3"] = "faLse";
+  node["key4"] = "";
+
+  EXPECT_TRUE(node.IsMap());
+  EXPECT_EQ(4, node.size());
+  EXPECT_EQ(false, node["key1"].as<bool>());
+  EXPECT_EQ(false, node["key2"].as<bool>());
+  EXPECT_THROW_REPRESENTATION_EXCEPTION(
+      (node["key3"].as<bool>()), ErrorMsg::BAD_CONVERSION);
+  EXPECT_THROW_REPRESENTATION_EXCEPTION(
+      (node["key4"].as<bool>()), ErrorMsg::BAD_CONVERSION);
+  EXPECT_THROW_REPRESENTATION_EXCEPTION(
+      (node.as<bool>()), ErrorMsg::BAD_CONVERSION);
+}
+
 TEST(NodeTest, AutoBoolConversion) {
 #ifdef _MSC_VER
 #pragma warning(disable : 4800)
