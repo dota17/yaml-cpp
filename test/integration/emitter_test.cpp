@@ -403,6 +403,14 @@ TEST_F(EmitterTest, LongKeyFlowMap) {
   ExpectEmit("{simple key: and value, ? long key: and its value}");
 }
 
+TEST_F(EmitterTest, SingleLongKeyFlowMap) {
+  out << Flow << BeginMap;
+  out << LongKey << Key << "long key" << Value << "value";
+  out << EndMap;
+
+  ExpectEmit("{ ?long key: value}");
+}
+
 TEST_F(EmitterTest, BlockMapAsKey) {
   out << BeginMap;
   out << Key;
@@ -1612,6 +1620,38 @@ class EmitterErrorTest : public ::testing::Test {
   Emitter out;
 };
 
+TEST_F(EmitterErrorTest, BadBeginDocInMap) {
+  out << BeginDoc;
+  out << BeginMap << Key << "key" << Value << "value" << BeginDoc << EndMap;
+  out << EndDoc;
+  out << EndDoc;
+
+  ExpectEmitError("Unexpected begin document");
+}
+
+TEST_F(EmitterErrorTest, BadBeginDocInTag) {
+  out << BeginDoc;
+  out << VerbatimTag("!foo") << BeginDoc << "bar";
+  out << EndDoc;
+  out << EndDoc;
+
+  ExpectEmitError("Unexpected begin document");
+}
+
+TEST_F(EmitterErrorTest, BadEndDocInMap) {
+  out << BeginDoc;
+  out << BeginMap << Key << "key" << Value << "value" << EndDoc << EndMap;
+
+  ExpectEmitError("Unexpected begin document");
+}
+
+TEST_F(EmitterErrorTest, BadEndDocInTag) {
+  out << BeginDoc;
+  out << VerbatimTag("!foo") << EndDoc << "bar";
+
+  ExpectEmitError("Unexpected begin document");
+}
+
 TEST_F(EmitterErrorTest, BadLocalTag) {
   out << LocalTag("e!far") << "bar";
 
@@ -1668,6 +1708,15 @@ TEST_F(EmitterErrorTest, InvalidAnchor) {
 TEST_F(EmitterErrorTest, InvalidAlias) {
   out << BeginSeq;
   out << Alias("new\nline");
+  out << EndSeq;
+
+  ExpectEmitError(ErrorMsg::INVALID_ALIAS);
+}
+
+TEST_F(EmitterErrorTest, InvalidAnchorAndAlias) {
+  out << BeginSeq;
+  out << Anchor("foo");
+  out << Alias("alias");
   out << EndSeq;
 
   ExpectEmitError(ErrorMsg::INVALID_ALIAS);
