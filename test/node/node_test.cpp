@@ -260,6 +260,36 @@ TEST(NodeTest, RemoveUnassignedNodeFromMap) {
   EXPECT_EQ(0, node.size());
 }
 
+TEST(NodeTest, MarkWithUndefined) {
+  Node node(NodeType::Undefined);
+  node = Node("");
+  EXPECT_TRUE(node.IsScalar());
+  EXPECT_EQ("", node.as<std::string>());
+}
+
+TEST(NodeTest, SetType) {
+  Node node1(NodeType::Null);
+  Node node2(NodeType::Scalar);
+  Node clone = Clone(node1);
+  node2 = Node("test");
+  EXPECT_TRUE(clone.IsNull());
+  EXPECT_EQ(NodeType::Null, clone.Type());
+  EXPECT_TRUE(node2.IsScalar());
+  EXPECT_EQ("test", node2.as<std::string>());
+}
+
+TEST(NodeTest, DefaultSize) {
+  Node node1(NodeType::Undefined);
+  Node node2(NodeType::Scalar);
+  node2 = Node("test");
+
+  EXPECT_EQ(0, node1.size());
+  EXPECT_TRUE(!node1.IsDefined());
+  EXPECT_TRUE(node2.IsScalar());
+  EXPECT_EQ(0, node2.size());
+  EXPECT_EQ("test", node2.as<std::string>());
+}
+
 TEST(NodeTest, MapForceInsert) {
   Node node;
   Node k1("k1");
@@ -294,6 +324,21 @@ TEST(NodeTest, MapIteratorWithUndefinedValues) {
   for (const_iterator it = node.begin(); it != node.end(); ++it)
     count++;
   EXPECT_EQ(1, count);
+}
+
+TEST(NodeTest, IteratorUndefinedTypeWithScalarType) {
+  Node node1(NodeType::Undefined);
+  Node node2(NodeType::Scalar);
+  node2 = Node("test");
+
+  std::size_t count = 0;
+  for (iterator it = node1.begin(); it != node1.end(); ++it)
+    count++;
+  EXPECT_EQ(0, count);
+  
+  for (iterator it = node2.begin(); it != node2.end(); ++it)
+    count++;
+  EXPECT_EQ(0, count);
 }
 
 TEST(NodeTest, ConstIteratorOnConstUndefinedNode) {

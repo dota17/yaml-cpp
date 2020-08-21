@@ -475,6 +475,41 @@ TEST_F(EmitterTest, AliasAndAnchorInFlow) {
   ExpectEmit("[&fred {name: Fred, age: 42}, *fred]");
 }
 
+TEST_F(EmitterTest, AnchorWithNextLine) {
+  out << BeginSeq;
+  out << Anchor("\xC2\x85") << "foo";
+  out << EndSeq;
+
+  ExpectEmit("- &\xC2\x85 foo");
+}
+
+TEST_F(EmitterTest, AnchorWithTurnTheExclamationPointDown) {
+  out << BeginSeq;
+  out << Anchor("\xC2\xA1") << "foo";
+  out << EndSeq;
+
+  ExpectEmit("- &\xC2\xA1 foo");
+}
+
+TEST_F(EmitterTest, IllegalCodePoints) {
+  out << BeginSeq;
+  out << DoubleQuoted << "\xED\xBF\xBF";
+  out << DoubleQuoted << "\xEF\xBF\xBE";
+  out << DoubleQuoted << "\xEF\xB7\xAF";
+  out << EndSeq;
+
+  ExpectEmit("- \"\xEF\xBF\xBD\"\n- \"\xEF\xBF\xBD\"\n- \"\xEF\xBF\xBD\"");
+}
+
+TEST_F(EmitterTest, GetNextCodePointAndAdvance) {
+  out << BeginSeq;
+  out << DoubleQuoted << "\xCC";
+  out << DoubleQuoted << "\x86";
+  out << EndSeq;
+
+  ExpectEmit("- \"\xEF\xBF\xBD\"\n- \"\xEF\xBF\xBD\"");
+}
+
 TEST_F(EmitterTest, SimpleVerbatimTag) {
   out << VerbatimTag("!foo") << "bar";
 
@@ -1720,6 +1755,22 @@ TEST_F(EmitterErrorTest, InvalidAnchorAndAlias) {
   out << EndSeq;
 
   ExpectEmitError(ErrorMsg::INVALID_ALIAS);
+}
+
+TEST_F(EmitterErrorTest, AnchorWithPageIndentifier) {
+  out << BeginSeq;
+  out << Anchor("\f") << "foo";
+  out << EndSeq;
+
+  ExpectEmitError(ErrorMsg::INVALID_ANCHOR);
+}
+
+TEST_F(EmitterErrorTest, AnchorWithApplicationCommand) {
+  out << BeginSeq;
+  out << Anchor("\xC2\x9F") << "foo";
+  out << EndSeq;
+
+  ExpectEmitError(ErrorMsg::INVALID_ANCHOR);
 }
 }  // namespace
 }  // namespace YAML
